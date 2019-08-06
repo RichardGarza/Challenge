@@ -1,6 +1,7 @@
-const fs = require('fs') 
-  
-fs.readFile('Input.txt', (err, data) => { // Read File First
+const fs = require('fs');
+const FILENAME = 'Input.txt';
+
+fs.readFile(FILENAME, (err, data) => { // Read File First
     if (err){ console.log(err) } 
     var fs = require('fs');
 
@@ -20,25 +21,57 @@ fs.readFile('Input.txt', (err, data) => { // Read File First
       if((currentEntry >= 0) && (currentEntry <= 9)){ // Check for integer
         acctNumber.push(currentEntry);  // If integer, add to currentEntry array
       } else {
-        // Skip
+        if(dataString[i] !== '|' && dataString[i] !== '_' && dataString[i] !== '\r'&& dataString[i] !== '\n'){
+          acctNumber.push('?');
+          if(acctNumber[0] !== 'ILL'){
+            acctNumber.unshift('ILL');
+          }
+        }
+        
       }  
-      let entryEnd = (i/83)
-      if(Number.isInteger(entryEnd) && entryEnd !== 0){ // When finished with entry,  
 
-        if( acctNumber.length !== 9 ){  // Count Account Number
-          console.log(`Account Number ${entryEnd} is invalid.`);
-          acctNumber = [];
-        } else {                 // Assuming it's a valid number, 
-          let acctNumberString = acctNumber.join("");
-          results.push({                // push object onto results array 
+      let entryEnd = (i/83)
+      if(Number.isInteger(entryEnd) && entryEnd !== 0){ // When finished with entry,
+
+        let illegitimate = acctNumber[0] === 'ILL';
+
+        if (acctNumber.length !== 9 || illegitimate) {
+           if(illegitimate){
+
+           } else {
+             acctNumber.push(" ERR")
+           }
+        } else {
+          let acctNumberString = acctNumber.join(""); 
+        }
+        
+
+        if(  ){  // Count Account Number
+          
+          results.push({                // Push object onto results array 
             id: results.length + 1,
             accountNumber: acctNumberString
           });
+          // Then append the result to the Results.txt file
           fs.appendFile('Results.txt', `Entry ${results.length}: ${acctNumberString} \r`, function (err) {
             if (err) throw err;
           });
+          
+        } else {                 // Assuming it's a valid number, 
+
+
+          results.push({                // Push object onto results array 
+            id: results.length + 1,
+            accountNumber: acctNumberString
+          });
+          // Then append the result to the Results.txt file
+          fs.appendFile('Results.txt', `Entry ${results.length}: ${acctNumberString} \r`, function (err) {
+            if (err) throw err;
+          });
+
         }
-        acctNumber = [];
+        acctNumber = []; // Then reset acctNumber to prepare for next entry.
+
       } 
     };
     console.log(results);
