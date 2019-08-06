@@ -22,31 +22,42 @@ fs.readFile('Input.txt', (err, data) => { // Read File First
       } else {
         // Skip
       }  
-      let entryEnd = (i/83)
+      let entryEnd = (i/89)
       if(Number.isInteger(entryEnd) && entryEnd !== 0){ // When finished with entry,  
 
         if( acctNumber.length !== 9 ){  // Count Account Number
-          console.log(`Account Number ${entryEnd} is invalid.`);
           acctNumber = [];
-        } else {                 // Assuming it's a valid number, 
-          let acctNumberString = acctNumber.join("");
-          results.push({                // push object onto results array 
-            id: results.length + 1,
-            accountNumber: acctNumberString
-          });
-          fs.appendFile('Results.txt', `Entry ${results.length}: ${acctNumberString} \r`, function (err) {
-            if (err) throw err;
-          });
+        } else {                 // Assuming it's a 9 digit number, Validate it.
+          let checksum = 0;
+
+          for(let x =  8; x >= 0; x-- ){ // Create checksum
+            checksum = (-1 * (x - 9) * acctNumber[x]) + checksum;
+          }
+
+          if((checksum % 11) === 0){ // Checksum modulus 11 should equal 0
+            let acctNumberString = acctNumber.join("");
+            results.push({                // Push object onto results array 
+              id: results.length + 1,
+              accountNumber: acctNumberString
+            });
+            fs.appendFile('Results.txt', `Entry ${results.length}: ${acctNumberString} \r`, function (err) {
+              if (err) throw err;
+            });
+          }  
         }
         acctNumber = [];
       } 
     };
-    console.log(results);
 
     if (results.length === 0){
       fs.writeFile('Results.txt', 'No Account Numbers Were Found.', function (err) {
         if (err) throw err;
         console.log( 'No Account Numbers Were Found.' );
       });
+    } else {
+      console.log('Account Numbers Saved!');
+      console.log(results);
+      // The 'results' object contains all account numbers and 
+      // can also be used at this point for anything else. 
     }
 });
